@@ -1,0 +1,28 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+<PageTitle>College Event System</PageTitle>
+
+<div class="container-fluid">
+    <header>
+        <NavMenu />
+    </header>
+
+
+        <div class="container mt-4">
+            @Body
+        </div>
+</div>
+
+@code {
+    private ClaimsPrincipal newUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        newUser = authState.User;
+    }
+}

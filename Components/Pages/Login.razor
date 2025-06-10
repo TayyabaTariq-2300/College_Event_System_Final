@@ -1,0 +1,119 @@
+﻿@page "/login"
+@using Microsoft.EntityFrameworkCore
+@using System.ComponentModel.DataAnnotations
+@using College_Event_System_Final.Services
+@inject AppDbContext _context
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+@using College_Event_System_Final.Helpers
+@using College_Event_System_Final.Models
+@rendermode InteractiveServer
+ @inject UserSessionService UserSession
+
+<h3>Login</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<EditForm Model="@Input" OnValidSubmit="HandleLogin" FormName="loginForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="Input.Email" @oninput="ClearError" />
+        <ValidationMessage For="@(() => Input.Email)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Password:</label>
+        <InputText type="password" class="form-control" @bind-Value="Input.Password" @oninput="ClearError" />
+        <ValidationMessage For="@(() => Input.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@code {
+    private LoginInput Input { get; set; } = new();
+    public string? ErrorMessage { get; set; }
+
+    public class LoginInput
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Password is required")]
+        public string Password { get; set; } = "";
+    }
+
+    private void ClearError(ChangeEventArgs e)
+    {
+        ErrorMessage = null;
+    }
+
+    // private async Task HandleLogin()
+    // {
+    //     var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.Trim().ToLower());
+    //     if (user == null || !PasswordHelper.VerifyPassword(user, user.Password, Input.Password))
+    //     {
+    //         ErrorMessage = "Invalid email or password.";
+    //         return;
+    //     }
+    //     var httpContext = HttpContextAccessor.HttpContext;
+    //     if (httpContext == null)
+    //     {
+    //         ErrorMessage = "Session not available.";
+    //         return;
+    //     }
+    //     httpContext.Session.SetString("UserID", user.UserID.ToString());
+
+    //     HttpContextAccessor.HttpContext!.Session.SetString("UserID", user.UserID.ToString());
+    //     HttpContextAccessor.HttpContext!.Session.SetString("UserRole", user.Role);
+
+    //     if (user.Role == "Admin")
+    //     {
+    //         NavigationManager.NavigateTo("/adminDashboard");
+    //     }
+    //     else if (user.Role == "Student")
+    //     {
+    //         NavigationManager.NavigateTo("/studentdashboard");
+    //     }
+    // }
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.Trim().ToLower());
+
+            if (user == null || !PasswordHelper.VerifyPassword(user, user.Password, Input.Password))
+            {
+                ErrorMessage = "Invalid email or password.";
+                return;
+            }
+
+            // Store login info in the scoped service
+            UserSession.UserID = user.UserID.ToString();
+            UserSession.Role = user.Role;
+
+            if (user.Role == "Admin")
+            {
+                NavigationManager.NavigateTo("/adminDashboard");
+            }
+            else if (user.Role == "Student")
+            {
+                NavigationManager.NavigateTo("/studentDashboard");
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Unexpected error: " + ex.Message;
+        }
+    }
+
+}

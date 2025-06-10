@@ -1,0 +1,91 @@
+﻿@page "/register"
+@inject AppDbContext _context
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor HttpContextAccessor
+@using College_Event_System_Final.Models
+@using College_Event_System_Final.Helpers
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@using College_Event_System_Final.Services
+@inject UserSessionService UserSession
+
+<h3>Register</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<EditForm Model="@Input" OnValidSubmit="HandleRegister" FormName="registerForm">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="Input.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email:</label>
+        <InputText class="form-control" @bind-Value="Input.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Password:</label>
+        <InputText type="password" class="form-control" @bind-Value="Input.Password" />
+    </div>
+
+    <div class="mb-3">
+        <label>Role:</label>
+        <InputSelect class="form-control" @bind-Value="Input.Role">
+            <option value="Student">Student</option>
+            <option value="Admin">Admin</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</EditForm>
+
+@code {
+    private RegisterInput Input { get; set; } = new();
+    public string? ErrorMessage { get; set; }
+
+    public class RegisterInput
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string Role { get; set; } = "Student";
+    }
+
+    private async Task HandleRegister()
+    {
+        var existingUser = await _context.Users
+    .FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.Trim().ToLower());
+
+        if (existingUser != null)
+        {
+            ErrorMessage = "Email is already registered.";
+            return;
+        }
+
+
+        var user = new User
+            {
+                Name = Input.Name,
+                Email = Input.Email,
+                Role = Input.Role
+            };
+
+        // Pass the newly created user object (non-null) to the hasher
+        user.Password = PasswordHelper.HashPassword(user, Input.Password);
+
+
+        Console.WriteLine($"Registering: {user.Name}, {user.Email}");
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        NavigationManager.NavigateTo("/login");
+    }
+}
