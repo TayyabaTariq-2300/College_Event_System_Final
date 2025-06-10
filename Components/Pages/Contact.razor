@@ -1,0 +1,55 @@
+﻿@page "/contact-us"
+
+
+
+<!-- Contact Form -->
+<section class="contact-container">
+    <h2>Get in Touch</h2>
+    <EditForm Model="@Input" OnValidSubmit="HandleContact" FormName="contactForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Name:</label>
+            <InputText class="form-control" @bind-Value="Input.Name" />
+        </div>
+
+        <div class="mb-3">
+            <label>Email:</label>
+            <InputText class="form-control" @bind-Value="Input.Email" />
+        </div>
+
+        <div class="mb-3">
+            <label>Message:</label>
+            <InputTextArea class="form-control" @bind-Value="Input.Message" />
+        </div>
+
+        <button type="submit" class="btn-contact">Send Message</button>
+    </EditForm>
+</section>
+
+<!-- Social Links -->
+<section class="social-links">
+    <h2>Follow Us</h2>
+    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+</section>
+
+@code {
+    private ContactInput Input { get; set; } = new();
+    public string? SuccessMessage { get; set; }
+
+    public class ContactInput
+    {
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Message { get; set; } = "";
+    }
+
+    private async Task HandleContact()
+    {
+        // Simulating a successful submission
+        SuccessMessage = "Your message has been sent. We’ll get back to you soon!";
+    }
+}
