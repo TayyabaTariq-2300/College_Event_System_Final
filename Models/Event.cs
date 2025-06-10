@@ -1,9 +1,12 @@
-﻿namespace College_Event_System_Final.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace College_Event_System_Final.Models
 {
     public class Event
     {
         public int EventID { get; set; }
         public string Title { get; set; }
+        [Required]
         public string Description { get; set; }
         public DateTime Date { get; set; }
         public string Time { get; set; }

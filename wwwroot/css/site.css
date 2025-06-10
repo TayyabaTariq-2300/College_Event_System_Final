@@ -639,6 +639,150 @@ input, textarea {
             color: red;
         }
 
+
+/* Page Titles */
+.page-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Event Grid Layout */
+.event-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Event Card */
+.event-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.3);
+    text-align: center;
+    transition: 0.3s;
+}
+
+/* Event Details */
+.event-details {
+    width: 50%;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+/* View Details Button */
+.event-link {
+    display: inline-block;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, #0047AB, #007BFF); /* Deep blue gradient */
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 8px rgba(0, 71, 171, 0.4);
+}
+
+    /* Hover effect */
+    .event-link:hover {
+        background: linear-gradient(90deg, #007BFF, #66B2FF);
+        transform: scale(1.05);
+        box-shadow: 0px 6px 12px rgba(0, 71, 171, 0.6);
+    }
+
+
+/* Back Link */
+.back-link {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+}
+
+    .back-link:hover {
+        color: red;
+    }
+
+/* No Events */
+.no-events, .no-event {
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+    margin-top: 30px;
+}
+
+/* Admin Dashboard Layout */
+.admin-dashboard {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: #222;
+    color: white;
+    padding: 20px;
+    position: fixed;
+    height: 100%;
+}
+
+    .sidebar h2 {
+        font-size: 1.8rem;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+        .sidebar ul li {
+            padding: 10px;
+        }
+
+            .sidebar ul li a {
+                color: white;
+                text-decoration: none;
+                display: block;
+                transition: 0.3s;
+            }
+
+                .sidebar ul li a:hover {
+                    background: #444;
+                }
+
+/* Main Content */
+.dashboard-content {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+/* Add Event Button */
+.btn-add-event {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #A10000, #D10000);
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+    .btn-add-event:hover {
+        background: linear-gradient(90deg, #D10000, #FF4444);
+        transform: scale(1.05);
+    }
+
+
 /* Footer */
 footer {
     background: linear-gradient(135deg, rgba(10, 5, 25, 0.95), rgba(30, 15, 60, 0.95));

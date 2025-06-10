@@ -1,0 +1,29 @@
+﻿@page "/event/{EventID:int}"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+
+@if (Event != null)
+{
+    <div class="event-details">
+        <h2>@Event.Title</h2>
+        <p><strong>Date:</strong> @Event.Date.ToShortDateString()</p>
+        <p><strong>Time:</strong> @Event.Time</p>
+        <p><strong>Location:</strong> @Event.Location</p>
+        <p class="description">@Event.Description</p>
+        <a href="/events" class="back-link">Back to Events</a>
+    </div>
+}
+else
+{
+    <p class="no-event">Event not found.</p>
+}
+
+@code {
+    [Parameter] public int EventID { get; set; }
+    private Event? Event;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Event = await _context.Events.FirstOrDefaultAsync(e => e.EventID == EventID);
+    }
+}

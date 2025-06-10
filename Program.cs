@@ -13,14 +13,19 @@ builder.Services.AddScoped<UserSessionService>();
 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped); // Ensures DbContext is scoped per request
+
+
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddServerSideBlazor().AddCircuitOptions(options =>
+builder.Services.AddServerSideBlazor(options =>
 {
     options.DetailedErrors = true;
+    options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(5);
 });
+
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -47,6 +52,11 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
 
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+    options.ClientTimeoutInterval = TimeSpan.FromMinutes(2);
+});
 
 var app = builder.Build();
 

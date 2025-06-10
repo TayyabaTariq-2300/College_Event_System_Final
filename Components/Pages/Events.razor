@@ -1,0 +1,32 @@
+﻿@page "/events"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+
+<h2 class="page-title">Upcoming Events</h2>
+
+@if (eve != null && eve.Any())
+{
+    <div class="event-grid">
+        @foreach (var eventItem in eve)
+        {
+            <div class="event-card">
+                <h3>@eventItem.Title</h3>
+               
+                <NavLink href="@($"/event/{eventItem.EventID}")" class="event-link">View Details</NavLink>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="no-events">No upcoming events.</p>
+}
+
+@code {
+    private List<Event>? eve;
+
+    protected override async Task OnInitializedAsync()
+    {
+        eve = await _context.Events.ToListAsync();
+    }
+}

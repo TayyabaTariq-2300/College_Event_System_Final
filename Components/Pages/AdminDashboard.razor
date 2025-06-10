@@ -1,7 +1,57 @@
-﻿@page "/admindashboard"
+﻿@* @page "/admindashboard"
 
 <h3>AdminDashboard</h3>
 
 @code {
+
+}
+ *@
+
+
+
+ @page "/admindashboard"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="admin-dashboard">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><NavLink href="/admindashboard/add-event">Add Event</NavLink></li>
+            <li><NavLink href="/admindashboard/edit-event">Edit Event</NavLink></li>
+            <li><NavLink href="/admindashboard/delete-event">Delete Event</NavLink></li>
+            <li><NavLink href="/admindashboard/view-students">View Students</NavLink></li>
+        </ul>
+    </aside>
+
+    @* <!-- Main Content -->
+    <section class="dashboard-content">
+        <h2>Admin Dashboard</h2>
+        <Router AppAssembly="typeof(Program).Assembly">
+            <Found Context="routeData">
+                <RouteView RouteData="@routeData" DefaultLayout="typeof(MainLayout)" />
+            </Found>
+            <NotFound>
+                <h3>Page Not Found</h3>
+            </NotFound>
+        </Router>
+    </section> *@
+</div>
+
+@code {
+    private List<Event>? Events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        Events = await _context.Events.AsNoTracking().ToListAsync();
+    }
+
 
 }
