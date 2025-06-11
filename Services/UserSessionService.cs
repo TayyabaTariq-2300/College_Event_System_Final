@@ -4,5 +4,11 @@
     {
         public string? UserID { get; set; }
         public string? Role { get; set; }
+
+        public void DebugSession()
+        {
+            Console.WriteLine($"UserID: {UserID}, Role: {Role}");
+        }
     }
+
 }

@@ -12,31 +12,31 @@
 @inject IJSRuntime JSRuntime
 
 <div class="login-container">
-<h3>Login</h3>
+    <h3>Login</h3>
 
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <div class="alert alert-danger">@ErrorMessage</div>
-}
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
 
-<EditForm Model="@Input" OnValidSubmit="HandleLogin" FormName="loginForm">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <EditForm Model="@Input" OnValidSubmit="HandleLogin" FormName="loginForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="mb-3">
-        <label>Email:</label>
-        <InputText class="form-control" @bind-Value="Input.Email" @oninput="ClearError" />
-        <ValidationMessage For="@(() => Input.Email)" />
-    </div>
+        <div class="mb-3">
+            <label>Email:</label>
+            <InputText class="form-control" @bind-Value="Input.Email" @oninput="ClearError" />
+            <ValidationMessage For="@(() => Input.Email)" />
+        </div>
 
-    <div class="mb-3">
-        <label>Password:</label>
-        <InputText type="password" class="form-control" @bind-Value="Input.Password" @oninput="ClearError" />
-        <ValidationMessage For="@(() => Input.Password)" />
-    </div>
+        <div class="mb-3">
+            <label>Password:</label>
+            <InputText type="password" class="form-control" @bind-Value="Input.Password" @oninput="ClearError" />
+            <ValidationMessage For="@(() => Input.Password)" />
+        </div>
 
-    <button type="submit" class="btn btn-primary">Login</button>
-</EditForm>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </EditForm>
 </div>
 
 @code {
@@ -58,34 +58,6 @@
         ErrorMessage = null;
     }
 
-    // private async Task HandleLogin()
-    // {
-    //     var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == Input.Email.Trim().ToLower());
-    //     if (user == null || !PasswordHelper.VerifyPassword(user, user.Password, Input.Password))
-    //     {
-    //         ErrorMessage = "Invalid email or password.";
-    //         return;
-    //     }
-    //     var httpContext = HttpContextAccessor.HttpContext;
-    //     if (httpContext == null)
-    //     {
-    //         ErrorMessage = "Session not available.";
-    //         return;
-    //     }
-    //     httpContext.Session.SetString("UserID", user.UserID.ToString());
-
-    //     HttpContextAccessor.HttpContext!.Session.SetString("UserID", user.UserID.ToString());
-    //     HttpContextAccessor.HttpContext!.Session.SetString("UserRole", user.Role);
-
-    //     if (user.Role == "Admin")
-    //     {
-    //         NavigationManager.NavigateTo("/adminDashboard");
-    //     }
-    //     else if (user.Role == "Student")
-    //     {
-    //         NavigationManager.NavigateTo("/studentdashboard");
-    //     }
-    // }
 
     private async Task HandleLogin()
     {
@@ -123,5 +95,8 @@
             ErrorMessage = "Unexpected error: " + ex.Message;
         }
     }
+
+
+   
 
 }

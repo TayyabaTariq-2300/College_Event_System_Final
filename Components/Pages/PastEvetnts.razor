@@ -1,0 +1,40 @@
+﻿@page "/studentdashboard/past-events"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+
+<h3>Past Events</h3>
+
+@if (pastEvents == null)
+{
+    <p><em>Loading past events...</em></p>
+}
+else if (!pastEvents.Any())
+{
+    <p>No past events available.</p>
+}
+else
+{
+    <ul class="event-list past-events">
+        @foreach (var ev in pastEvents)
+        {
+            <li>
+                <strong>@ev.Title</strong><br />
+                Date: @ev.Date.ToString("dd MMM yyyy")<br />
+                Location: @ev.Location
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Event>? pastEvents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch only past events
+        pastEvents = await _context.Events
+            .Where(e => e.Date < DateTime.Today)
+            .OrderByDescending(e => e.Date)
+            .ToListAsync();
+    }
+}

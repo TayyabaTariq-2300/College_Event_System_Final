@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+
 builder.Services.AddScoped<UserSessionService>();
 
 
@@ -36,9 +38,14 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
-        options.LoginPath = "/login"; // Adjust as needed
-        options.AccessDeniedPath = "/accessdenied";
+        options.LoginPath = "/Login";  // Or your actual login route
+        options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
     });
+
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddAuthorization(options =>
 {

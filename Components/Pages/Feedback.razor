@@ -1,89 +1,105 @@
 ﻿@page "/studentdashboard/feedback"
-@inject College_Event_System_Final.Models.AppDbContext _context
-@inject NavigationManager NavigationManager
-@inject College_Event_System_Final.Services.UserSessionService UserSession
+@inject AppDbContext _context
 @using Microsoft.EntityFrameworkCore
-@using Microsoft.AspNetCore.Components.Forms
 @namespace College_Event_System_Final.Models
+<h2>Give Feedback</h2>
 
-@using System.ComponentModel.DataAnnotations;
+<EditForm Model="@NewFeedback" OnValidSubmit="HandleSubmitFeedback">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-
-<h3>Feedback</h3>
-
-@if (!isLoaded)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <EditForm Model="feedbackModel" OnValidSubmit="HandleValidSubmit" FormName="FeedbackForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="mb-3">
-            <label for="eventSelect" class="form-label">Event</label>
-            <select id="eventSelect" class="form-select" @bind="feedbackModel.EventID" required>
-                <option value="">Select an event</option>
-                @foreach (var ev in events)
-                {
-                    <option value="@ev.EventID">@ev.Title</option>
-                }
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="rating" class="form-label">Rating (1-5)</label>
-            <input type="number" id="rating" class="form-control" @bind="feedbackModel.Rating" min="1" max="5" required />
-        </div>
-
-        <div class="mb-3">
-            <label for="comments" class="form-label">Comments</label>
-            <textarea id="comments" class="form-control" @bind="feedbackModel.Comments" rows="4"></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Submit Feedback</button>
-
-        @if (successMessage != null)
+    <div class="mb-3">
+        <label>Select Event:</label>
+        @if (Events == null || !Events.Any())
         {
-            <div class="alert alert-success mt-3">@successMessage</div>
+            <p>No events found.</p>
         }
-    </EditForm>
+        else
+        {
+            <InputSelect class="form-control" @bind-Value="NewFeedback.EventID" TValue="int">
+                <option disabled selected>Choose an event</option>
+                @foreach (var eventItem in Events)
+                {
+                    <option value="@eventItem.EventID">@eventItem.Title</option>
+                }
+            </InputSelect>
+        }
+    </div>
+
+    <div class="mb-3">
+        <label>Rating (1-5):</label>
+        <InputNumber class="form-control" @bind-Value="NewFeedback.Rating" TValue="int" Min="1" Max="5" />
+    </div>
+
+    <div class="mb-3">
+        <label>Comments:</label>
+        <InputTextArea class="form-control" @bind-Value="NewFeedback.Comments" />
+    </div>
+
+    <button type="submit" class="btn-feedback">Submit Feedback</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(SuccessMessage))
+{
+    <div class="alert alert-success">@SuccessMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
 }
 
 @code {
-    private Feedback feedbackModel = new Feedback();
-    private List<Event> events = new();
-    private string? successMessage;
-    private bool isLoaded = false;
+    private Feedback NewFeedback { get; set; } = new();
+    private List<Event>? Events;
+    public string? SuccessMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        // Make sure user is logged in
-        if (string.IsNullOrEmpty(UserSession.UserID))
+        try
         {
-            NavigationManager.NavigateTo("/login");
-            return;
+            Events = await _context.Events.AsNoTracking().ToListAsync();
         }
-
-        // Load events from DB to populate dropdown
-        events = await _context.Events.ToListAsync();
-
-        isLoaded = true;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching events: {ex.Message}");
+            ErrorMessage = $"Error loading events: {ex.Message}";
+        }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task HandleSubmitFeedback()
     {
-        // Assign the current logged in UserID to feedback
-        feedbackModel.UserID = int.Parse(UserSession.UserID!);
+        try
+        {
+            if (NewFeedback.EventID == 0)
+            {
+                ErrorMessage = "Please select an event!";
+                return;
+            }
 
-        _context.Feedbacks.Add(feedbackModel);
-        await _context.SaveChangesAsync();
+            if (NewFeedback.Rating < 1 || NewFeedback.Rating > 5)
+            {
+                ErrorMessage = "Rating must be between 1 and 5!";
+                return;
+            }
 
-        successMessage = "Thank you for your feedback!";
+            if (string.IsNullOrWhiteSpace(NewFeedback.Comments))
+            {
+                ErrorMessage = "Please provide feedback!";
+                return;
+            }
 
-        // Reset form
-        feedbackModel = new Feedback();
-        StateHasChanged();
+            _context.Feedbacks.Add(NewFeedback);
+            await _context.SaveChangesAsync();
+
+            SuccessMessage = "Feedback submitted successfully!";
+            NewFeedback = new(); // Reset form after submission
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Database Save Error: {ex.Message}");
+            ErrorMessage = $"An error occurred while submitting feedback: {ex.Message}";
+        }
     }
 }
