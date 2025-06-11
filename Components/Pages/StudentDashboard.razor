@@ -1,7 +1,20 @@
 ﻿@page "/studentdashboard"
+@inject NavigationManager NavManager
 
-<h3>StudentDashboard</h3>
+<div class="student-dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="student-sidebar">
+        <h2>Student Panel</h2>
+        <ul>
+            <li><NavLink href="/studentdashboard/upcoming-events">View Upcoming Events</NavLink></li>
+            <li><NavLink href="/studentdashboard/register-event">Register for Events</NavLink></li>
+            <li><NavLink href="/studentdashboard/feedback">Feedback</NavLink></li>
+        </ul>
+    </aside>
 
-@code {
-
-}
+    <!-- Main Content Area -->
+    <main class="student-main">
+        <h3>Welcome to Student Dashboard</h3>
+        <p>Select an option from the sidebar to begin.</p>
+    </main>
+</div>

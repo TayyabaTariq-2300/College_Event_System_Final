@@ -8,8 +8,8 @@
 @using College_Event_System_Final.Helpers
 @using College_Event_System_Final.Models
 @rendermode InteractiveServer
- @inject UserSessionService UserSession
-
+@inject UserSessionService UserSession
+@inject IJSRuntime JSRuntime
 
 <div class="login-container">
 <h3>Login</h3>
@@ -103,6 +103,11 @@
             // Store login info in the scoped service
             UserSession.UserID = user.UserID.ToString();
             UserSession.Role = user.Role;
+
+
+            await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "UserID", UserSession.UserID);
+            await JSRuntime.InvokeVoidAsync("sessionStorage.setItem", "UserRole", UserSession.Role);
+
 
             if (user.Role == "Admin")
             {

@@ -1,0 +1,66 @@
+﻿@page "/profile"
+@inject College_Event_System_Final.Services.UserSessionService UserSession
+@inject College_Event_System_Final.Models.AppDbContext _context
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<h3>User Profile</h3>
+
+@if (user == null)
+{
+    <p>Loading user info...</p>
+}
+else
+{
+    <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+            <h5 class="card-title">@user.Name</h5>
+            <p class="card-text"><strong>Email:</strong> @user.Email</p>
+            <p class="card-text"><strong>Role:</strong> @UserSession.Role</p>
+
+            <button class="btn btn-danger" @onclick="Logout">Logout</button>
+        </div>
+    </div>
+}
+
+@code {
+    private College_Event_System_Final.Models.User? user;
+    private bool _initialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var userId = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "UserID");
+            var userRole = await JSRuntime.InvokeAsync<string>("sessionStorage.getItem", "UserRole");
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                NavigationManager.NavigateTo("/login");
+                return;
+            }
+
+            UserSession.UserID = userId;
+            UserSession.Role = userRole;
+
+            // Now fetch user details from DB
+            user = await _context.Users.FindAsync(int.Parse(userId));
+            
+            _initialized = true;
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout()
+    {
+        UserSession.UserID = null;
+        UserSession.Role = null;
+
+        await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "UserID");
+        await JSRuntime.InvokeVoidAsync("sessionStorage.removeItem", "UserRole");
+
+        NavigationManager.NavigateTo("/");
+    }
+}

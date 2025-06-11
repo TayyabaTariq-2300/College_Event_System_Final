@@ -1,0 +1,96 @@
+﻿@page "/studentdashboard/register-event"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+
+<h3>Register For Events</h3>
+
+@if (events == null)
+{
+    <p>Loading events...</p>
+}
+else if (!events.Any())
+{
+    <p>No upcoming events available for registration.</p>
+}
+else
+{
+    <EditForm Model="registrationModel" OnValidSubmit="HandleValidSubmit" FormName="RegisterEvent">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label for="name">Name:</label><br />
+            <InputText id="name" @bind-Value="registrationModel.StudentName" />
+        </div>
+        <div>
+            <label for="studentId">Student ID:</label><br />
+            <InputText id="studentId" @bind-Value="registrationModel.StudentId" />
+        </div>
+        <div>
+            <label for="email">Email:</label><br />
+            <InputText id="email" type="email" @bind-Value="registrationModel.StudentEmail" />
+        </div>
+        <div>
+            <label for="event">Select Event:</label><br />
+            <InputSelect id="event" @bind-Value="registrationModel.EventId">
+                <option value="">-- Select Event --</option>
+                @foreach (var ev in events)
+                {
+                    <option value="@ev.EventID">@ev.Title (@ev.Date.ToString("dd MMM yyyy"))</option>
+                }
+            </InputSelect>
+        </div>
+
+        <button type="submit">Register</button>
+    </EditForm>
+
+    @if (successMessage != null)
+    {
+        <p class="success-message">@successMessage</p>
+    }
+    @if (errorMessage != null)
+    {
+        <p class="error-message">@errorMessage</p>
+    }
+}
+
+@code {
+    private List<Event>? events;
+    private EventRegistration registrationModel = new();
+    private string? successMessage;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = await _context.Events
+            .Where(e => e.Date >= DateTime.Today)
+            .OrderBy(e => e.Date)
+            .ToListAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        successMessage = null;
+        errorMessage = null;
+
+        try
+        {
+            if (registrationModel.EventId == 0)
+            {
+                errorMessage = "Please select an event.";
+                return;
+            }
+
+            _context.EventRegistrations.Add(registrationModel);
+            await _context.SaveChangesAsync();
+
+            successMessage = "Registration successful!";
+            registrationModel = new EventRegistration(); // reset form
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error registering: {ex.Message}";
+        }
+    }
+}

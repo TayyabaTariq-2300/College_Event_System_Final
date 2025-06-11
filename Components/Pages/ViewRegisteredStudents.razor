@@ -1,0 +1,52 @@
+﻿@page "/admindashboard/view-registered-students"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+
+<h3>Registered Students</h3>
+
+@if (registrations == null)
+{
+    <p>Loading registrations...</p>
+}
+else if (!registrations.Any())
+{
+    <p>No students have registered for events yet.</p>
+}
+else
+{
+    <table class="registered-students-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Email</th>
+                <th>Event</th>
+                <th>Registration Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reg in registrations)
+            {
+                <tr>
+                    <td>@reg.StudentName</td>
+                    <td>@reg.StudentId</td>
+                    <td>@reg.StudentEmail</td>
+                    <td>@reg.Event?.Title</td>
+                    <td>@reg.RegistrationDate.ToString("dd MMM yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<EventRegistration>? registrations;
+
+    protected override async Task OnInitializedAsync()
+    {
+        registrations = await _context.EventRegistrations
+            .Include(r => r.Event)
+            .OrderByDescending(r => r.RegistrationDate)
+            .ToListAsync();
+    }
+}

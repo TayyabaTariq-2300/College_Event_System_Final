@@ -1,0 +1,40 @@
+﻿@page "/studentdashboard/upcoming-events"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+
+<h3>Upcoming Events</h3>
+
+@if (events == null)
+{
+    <p><em>Loading events...</em></p>
+}
+else if (!events.Any())
+{
+    <p>No upcoming events available.</p>
+}
+else
+{
+    <ul class="event-list">
+        @foreach (var ev in events)
+        {
+            <li>
+                <strong>@ev.Title</strong><br />
+                Date: @ev.Date.ToString("dd MMM yyyy")<br />
+                Location: @ev.Location
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<Event>? events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Assuming your Event model has a Date property
+        events = await _context.Events
+            .Where(e => e.Date >= DateTime.Today) // upcoming events only
+            .OrderBy(e => e.Date)
+            .ToListAsync();
+    }
+}

@@ -10,6 +10,8 @@ namespace College_Event_System_Final.Models
         public DbSet<Event> Events { get; set; }
         public DbSet<Registration> Registrations { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+        public DbSet<EventRegistration> EventRegistrations { get; set; }
+
     }
 
 }

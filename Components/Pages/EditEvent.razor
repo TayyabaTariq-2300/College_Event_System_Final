@@ -1,0 +1,117 @@
+﻿
+
+@page "/admindashboard/edit-event"
+@inject AppDbContext _context
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+
+<h2>Edit Events</h2>
+
+@if (events == null)
+{
+    <p>Loading events...</p>
+}
+else if (events.Count == 0)
+{
+    <p>No events available to edit.</p>
+}
+else
+{
+    <table class="edit-event-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in events)
+            {
+                <tr>
+                    <td>@e.Title</td>
+                    <td>@e.Date.ToShortDateString()</td>
+                    <td>@e.Location</td>
+                    <td>@e.Description</td>
+                    <td>
+                        <button class="btn-edit" @onclick="() => SelectEvent(e)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedEvent != null)
+{
+    <div class="edit-form">
+        <h3>Edit Event: @selectedEvent.Title</h3>
+        <EditForm Model="@selectedEvent" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <label>Title:</label>
+            <InputText @bind-Value="selectedEvent.Title" class="form-control" />
+
+            <label>Date:</label>
+            <InputDate @bind-Value="selectedEvent.Date" class="form-control" />
+
+            <label>Location:</label>
+            <InputText @bind-Value="selectedEvent.Location" class="form-control" />
+
+            <label>Description:</label>
+            <InputTextArea @bind-Value="selectedEvent.Description" class="form-control" />
+
+            <button type="submit" class="btn-save">Save Changes</button>
+            <button type="button" class="btn-cancel" @onclick="CancelEdit">Cancel</button>
+        </EditForm>
+    </div>
+}
+
+@code {
+    private List<Event>? events;
+    private Event? selectedEvent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = await _context.Events.ToListAsync();
+    }
+
+    private void SelectEvent(Event e)
+    {
+        // Create a copy so that original list is not directly edited
+        selectedEvent = new Event
+        {
+            EventID = e.EventID,
+            Title = e.Title,
+            Date = e.Date,
+            Location = e.Location,
+            Description = e.Description
+        };
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var eventToUpdate = await _context.Events.FindAsync(selectedEvent!.EventID);
+        if (eventToUpdate != null)
+        {
+            eventToUpdate.Title = selectedEvent.Title;
+            eventToUpdate.Date = selectedEvent.Date;
+            eventToUpdate.Location = selectedEvent.Location;
+            eventToUpdate.Description = selectedEvent.Description;
+
+            await _context.SaveChangesAsync();
+
+            // Reload the event list
+            events = await _context.Events.ToListAsync();
+            selectedEvent = null;
+        }
+    }
+
+    private void CancelEdit()
+    {
+        selectedEvent = null;
+    }
+}
